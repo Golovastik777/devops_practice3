@@ -2,7 +2,7 @@ University: [ITMO University](https://itmo.ru/ru/)<br />
 Faculty: [FICT](https://fict.itmo.ru)<br />
 Course: [Introduction in routing](https://github.com/itmo-ict-faculty/introduction-in-routing)<br />
 Year: 2025/2026<br />
-Group: K3323<br />
+Group: K3320<br />
 Author: Yakovlev Igor Sergeevich<br />
 Lab: Lab3<br />
 Date of create: 14.12.25<br />
@@ -27,64 +27,71 @@ Date of finished: 14.12.25<br />
 ```
 name: lab3
 mgmt:
-  network: custom_mgmt
-  ipv4-subnet: 172.16.16.0/24
+  network: lab-3
+  ipv4-subnet: 172.10.0.0/24
 
 topology:
-  kinds:
-    vr-ros:
-      image: vrnetlab/mikrotik_routeros:6.47.9
 
   nodes:
+    R01.SPB:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.101
+      startup-config: configs/R01.SPB.rsc
+    R01.HKI:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.102
+      startup-config: configs/R01.HKI.rsc
+    R01.MSK:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.103
+      startup-config: configs/R01.MSK.rsc
+    R01.LND:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.104
+      startup-config: configs/R01.LND.rsc
+    R01.LBN:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.105
+      startup-config: configs/R01.LBN.rsc
     R01.NY:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.101
-      startup-config: config/r01-ny.rsc
-    R02:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.102
-      startup-config: config/r02.rsc
-    R03:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.103
-      startup-config: config/r03.rsc
-    R04:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.104
-      startup-config: config/r04.rsc
-    R05:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.105
-      startup-config: config/r05.rsc
-    R06.SPB:
-      kind: vr-ros
-      mgmt-ipv4: 172.16.16.106
-      startup-config: config/r06-spb.rsc
-    SGI-Prism:
+      kind: vr_ros
+      image: vrnetlab/mikrotik_routeros:6.47.9
+      mgmt-ipv4: 172.10.0.106
+      startup-config: configs/R01.NY.rsc
+    PC1:
       kind: linux
       image: alpine:latest
-      mgmt-ipv4: 172.16.16.2
+      mgmt-ipv4: 172.10.0.2
       binds:
         - ./config:/config
       exec:
-        - sh /config/sgi-prism.sh
-    Engineer-PC:
+        - sh /config/PC.sh
+    SGI-PRISM:
       kind: linux
       image: alpine:latest
-      mgmt-ipv4: 172.16.16.3
+      mgmt-ipv4: 172.10.0.3
       binds:
         - ./config:/config
       exec:
-        - sh /config/engineer-pc.sh
+        - sh /config/PC.sh
+
 
   links:
-    - endpoints: ["R01.NY:eth1", "R02:eth1"]
-    - endpoints: ["R02:eth2", "R03:eth1"]
-    - endpoints: ["R03:eth2", "R04:eth1"]
-    - endpoints: ["R04:eth2", "R05:eth1"]
-    - endpoints: ["R05:eth2", "R06.SPB:eth1"]
-    - endpoints: ["R01.NY:eth2", "SGI-Prism:eth1"]
-    - endpoints: ["R06.SPB:eth2", "Engineer-PC:eth1"]
+    - endpoints: ["R01.SPB:eth1","R01.HKI:eth1"]
+    - endpoints: ["R01.SPB:eth2","R01.MSK:eth1"]
+    - endpoints: ["R01.SPB:eth3","PC1:eth1"]
+    - endpoints: ["R01.HKI:eth3","R01.LBN:eth3"]
+    - endpoints: ["R01.HKI:eth2","R01.LND:eth1"]
+    - endpoints: ["R01.MSK:eth2","R01.LBN:eth1"]
+    - endpoints: ["R01.LND:eth2","R01.NY:eth1"]
+    - endpoints: ["R01.LBN:eth2","R01.NY:eth2"]
+    - endpoints: ["R01.NY:eth3", "SGI-PRISM:eth1"]
+
 ```
 # Конфиги
 
@@ -110,100 +117,120 @@ topology:
 
 R01
 ```
-# Настройка пользователя
 /user
-add name=admin password=admin123 group=full
-
-/system identity
-set name=R01.NY
+add name=igor password=123 group=full
+remove admin
+/ip address
+add address=10.10.1.2/30 interface=ether2
+add address=10.10.2.1/30 interface=ether3
+add address=10.10.5.1/30 interface=ether4
 
 /interface bridge
 add name=loopback
-add name=vpls-bridge
-
-add address=10.20.1.1/30 interface=ether1
-add address=10.100.1.1/24 interface=ether2
-add address=10.255.255.1/32 interface=loopback
-
-/ip pool
-add name=dhcp-pool ranges=10.100.1.10-10.100.1.254
-/ip dhcp-server
-add address-pool=dhcp-pool disabled=no interface=ether2 name=dhcp-server
-/ip dhcp-server network
-add address=10.100.1.0/24 gateway=10.100.1.1
+/ip address 
+add address=10.255.255.3/32 interface=loopback network=10.255.255.3
 
 /routing ospf instance
-set [ find default=yes ] router-id=10.255.255.1
+add name=inst router-id=10.255.255.3
+set inst redistribute-connected=as-type-1
 /routing ospf area
-add name=backbone area-id=0.0.0.0
-/routing ospf interface
-add interface=ether1
-add interface=loopback
+add name=backbonev28 area-id=0.0.0.0 instance=inst
 /routing ospf network
-add area=backbone network=10.20.1.0/30
-add area=backbone network=10.255.255.1/32
+add area=backbonev28 network=10.10.1.0/30
+add area=backbonev28 network=10.10.2.0/30
+add area=backbonev28 network=10.10.5.0/30
+add area=backbonev28 network=10.255.255.3/32
+/routing ospf instance set inst redistribute-connected=as-type-1
 
 /mpls ldp
-set enabled=yes lsr-id=10.255.255.1 transport-address=10.255.255.1
+set lsr-id=10.255.255.3
+set enabled=yes transport-address=10.255.255.3
+/mpls ldp advertise-filter 
+add prefix=10.255.255.0/24 advertise=yes
+add advertise=no
+/mpls ldp accept-filter 
+add prefix=10.255.255.0/24 accept=yes
+add accept=no
 /mpls ldp interface
-add interface=ether1
+add interface=ether2
+add interface=ether3
+add interface=ether4
 
-/interface vpls
-add name=vpls-to-spb disabled=no remote-peer=10.255.255.6
-
-/interface bridge port
-add bridge=vpls-bridge interface=ether2
-add bridge=vpls-bridge interface=vpls-to-spb
+/system identity
+set name=R01.HKI
 ```
 ## Компьютеры
 
 Аналогично предыдущим работам, компьютеры запрашивают айпи у соответствующего dhcp-сервера на eth1.
 ```
 #!/bin/sh
-ip route del default via 172.16.16.1 dev eth0
+ip route del default via 172.10.0.1 dev eth0
 udhcpc -i eth1
-ip addr add 10.100.2.100/24 dev eth1 2>/dev/null || true
 ```
 
 # Результаты
 
-## 1: OSPF
+Доказательство работы OSPF:
 
-Проверяем динамическую маршрутизацию... через таблицы маршрутизации!
+```
 
-<img src="ospf-1.png" width=500px>
-<img src="ospf-2.png" width=500px>
-<img src="ospf-3.png" width=500px>
-<img src="ospf-4.png" width=500px>
-<img src="ospf-5.png" width=500px>
-<img src="ospf-6.png" width=500px>
+Flags: X - disabled, A - active, D - dynamic, C - connect, S - static, r - rip, b - bgp, o - ospf, m - mme, B - blackhole, U - unreachable, P - prohibit 
+ #      DST-ADDRESS        PREF-SRC        GATEWAY            DISTANCE
+ 0 ADC  10.10.1.0/30       10.10.1.2       ether2                    0
+ 1 ADC  10.10.2.0/30       10.10.2.1       ether3                    0
+ 2 ADo  10.10.3.0/30                       10.10.2.2               110
+ 3 ADo  10.10.4.0/30                       10.10.5.2               110
+ 4 ADC  10.10.5.0/30       10.10.5.1       ether4                    0
+ 5 ADo  10.10.6.0/30                       10.10.5.2               110
+ 6 ADo  10.10.7.0/30                       10.10.1.1               110
+ 7 ADo  10.255.255.2/32                    10.10.1.1               110
+ 8 ADC  10.255.255.3/32    10.255.255.3    loopback                  0
+ 9 ADo  10.255.255.4/32                    10.10.1.1               110
+                                           10.10.5.2         
+10 ADo  10.255.255.5/32                    10.10.5.2               110
+11 ADo  10.255.255.6/32                    10.10.2.2               110
+12 ADo  10.255.255.7/32                    10.10.5.2               110
+                                           10.10.2.2         
+13 ADC  172.31.255.28/30   172.31.255.30   ether1                    0
+14 ADo  192.168.14.0/24                    10.10.5.2               110
+                                           10.10.2.2         
+15 ADo  192.168.28.0/24                    10.10.1.1               110
+```
 
-Как можно заметить, нигде статические маршруты не были прописаны, всё настроено динамически.
+Доказательство работы MPLS:
 
-## 2: MPLS
+```
 
-Без фильтрации:
+Flags: H - hw-offload, L - ldp, V - vpls, T - traffic-eng 
+ #    IN-LABEL                                      OUT-LABELS                                   DESTINATION                    INTERFACE                                   NEXTHOP        
+ 0    expl-null                                    
+ 1  L 16                                                                                         10.255.255.2/32                ether2                                      10.10.1.1      
+ 2  L 17                                            18                                           10.255.255.4/32                ether2                                      10.10.1.1      
+ 3  L 18                                                                                         10.255.255.5/32                ether4                                      10.10.5.2      
+ 4  L 19                                                                                         10.255.255.6/32                ether3                                      10.10.2.2      
+ 5  L 20                                            20                                           10.255.255.7/32                ether4                                      10.10.5.2
+```
 
-<img src="mpls-1.png" width=500px>
-<img src="mpls-2.png" width=500px>
-<img src="mpls-3.png" width=500px>
-<img src="mpls-4.png" width=500px>
-<img src="mpls-5.png" width=500px>
-<img src="mpls-6.png" width=500px>
+Доказательство работы EoMPLS:
 
-С фильтрацией:
+```
 
-<img src="mpls-filter.png" width=500px>
+       remote-label: 21
+        local-label: 21
+      remote-status: 
+          transport: 10.255.255.2/32
+  transport-nexthop: 10.10.3.1
+     imposed-labels: 16,21
+```
 
-## 3: VPLS
+```
 
-<img src="vpls-1.png" width=500px>
-<img src="vpls-2.png" width=500px>
-
-<img src="vpls-3.png" width=500px>
-<img src="vpls-4.png" width=500px>
-
-## Соединение компьютеров
+       remote-label: 21
+        local-label: 21
+      remote-status: 
+  transport-nexthop: 10.10.1.2
+     imposed-labels: 20,21
+```
 
 <img src="ping.png" width=500px>
 
