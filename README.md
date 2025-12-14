@@ -171,12 +171,12 @@ ip addr add 10.100.2.100/24 dev eth1 2>/dev/null || true
 
 Проверяем динамическую маршрутизацию... через таблицы маршрутизации!
 
-<img src="images/ospf-1.png" width=500px>
-<img src="images/ospf-2.png" width=500px>
-<img src="images/ospf-3.png" width=500px>
-<img src="images/ospf-4.png" width=500px>
-<img src="images/ospf-5.png" width=500px>
-<img src="images/ospf-6.png" width=500px>
+<img src="ospf-1.png" width=500px>
+<img src="ospf-2.png" width=500px>
+<img src="ospf-3.png" width=500px>
+<img src="ospf-4.png" width=500px>
+<img src="ospf-5.png" width=500px>
+<img src="ospf-6.png" width=500px>
 
 Как можно заметить, нигде статические маршруты не были прописаны, всё настроено динамически.
 
@@ -184,28 +184,28 @@ ip addr add 10.100.2.100/24 dev eth1 2>/dev/null || true
 
 Без фильтрации:
 
-<img src="images/mpls-1.png" width=500px>
-<img src="images/mpls-2.png" width=500px>
-<img src="images/mpls-3.png" width=500px>
-<img src="images/mpls-4.png" width=500px>
-<img src="images/mpls-5.png" width=500px>
-<img src="images/mpls-6.png" width=500px>
+<img src="mpls-1.png" width=500px>
+<img src="mpls-2.png" width=500px>
+<img src="mpls-3.png" width=500px>
+<img src="mpls-4.png" width=500px>
+<img src="mpls-5.png" width=500px>
+<img src="mpls-6.png" width=500px>
 
 С фильтрацией:
 
-<img src="images/mpls-filter.png" width=500px>
+<img src="mpls-filter.png" width=500px>
 
 ## 3: VPLS
 
-<img src="images/vpls-1.png" width=500px>
-<img src="images/vpls-2.png" width=500px>
+<img src="vpls-1.png" width=500px>
+<img src="vpls-2.png" width=500px>
 
-<img src="images/vpls-3.png" width=500px>
-<img src="images/vpls-4.png" width=500px>
+<img src="vpls-3.png" width=500px>
+<img src="vpls-4.png" width=500px>
 
 ## Соединение компьютеров
 
-<img src="images/ping.png" width=500px>
+<img src="ping.png" width=500px>
 
 # Заключение
 
