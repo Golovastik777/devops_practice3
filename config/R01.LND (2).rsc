@@ -1,3 +1,7 @@
+/user
+add name=igor password=123 group=full
+remove admin
+
 /ip address
 add address=10.10.2.2/30 interface=ether2
 add address=10.10.3.1/30 interface=ether3
@@ -31,8 +35,6 @@ add accept=no
 add interface=ether2
 add interface=ether3
 
-/user
-add name=panindv password=panindv group=full
-remove admin
+
 /system identity
 set name=R01.LND
