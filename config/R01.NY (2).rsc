@@ -1,3 +1,7 @@
+/user
+add name=igor password=123 group=full
+remove admin
+
 /ip address
 add address=10.10.3.2/30 interface=ether2
 add address=10.10.4.2/30 interface=ether3
@@ -48,8 +52,6 @@ add disabled=no name=SGIPC remote-peer=10.255.255.2 cisco-style=yes cisco-style-
 /interface bridge port
 add interface=SGIPC bridge=vpn
 
-/user
-add name=panindv password=panindv group=full
-remove admin
+
 /system identity
 set name=R01.NY
